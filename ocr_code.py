@@ -6,7 +6,7 @@ import io
 from PIL import Image
 from PIL import ImageEnhance
 
-def read_captcha(self, img_byte):
+def read_captcha(img_byte):
     img = Image.open(io.BytesIO(img_byte)).convert('L')
     enh_bri = ImageEnhance.Brightness(img)
     new_img = enh_bri.enhance(factor=1.5)
@@ -25,6 +25,6 @@ def read_captcha(self, img_byte):
                             detail = 0)
     return result[0]
 
-def validate_code(self, session):
+def validate_code(session):
     img = session.get(self.url_code).content
     return read_captcha(img)
