@@ -14,7 +14,8 @@ logging.basicConfig(level=logging.INFO,
 # WeChat notice
 #get token via http://iyuu.cn/
 import requests
-from captcha_break import DailyFDCaptcha
+# from captcha_break import DailyFDCaptcha
+from ocr_code import validate_code
 from geo_disturbance import geoDisturbance
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -210,30 +211,33 @@ class Zlapp(Fudan):
                     "city"    : city,
                     "area"    : " ".join(set_q((province, city, district))),
                     "ismoved" : 0,
+                    "sfzx": "0",  # 是否在校
+                    # "fxyy": "",  # 返校原因
                     "geo_api_info" : geoDisturbance(self.last_info["geo_api_info"])
                 }
         )
         # logging.debug(self.last_info)
         for i in range(3):
-            captcha_text = captcha()
-            #captcha_text = 'abcd'
-            self.last_info.update({
-                'sfzx': 1,
-                'code': captcha_text
-            })
+            print("◉正在识别验证码......")
+            code = validate_code(self.session)
+            print("◉验证码为:", code)
+            self.last_info.update(
+                {
+                    "code": code,
+                }
+            )
+            # print(self.last_info)
             save = self.session.post(
-                    'https://zlapp.fudan.edu.cn/ncov/wap/fudan/save',
-                    data=self.last_info,
-                    headers=headers,
-                    allow_redirects=False)
+                'https://zlapp.fudan.edu.cn/ncov/wap/fudan/save',
+                data=self.last_info,
+                headers=headers,
+                allow_redirects=False)
 
             save_msg = json_loads(save.text)["m"]
-            logging.info(save_msg)
-            if save_msg != '验证码错误':
+            print(save_msg, '\n\n')
+            time.sleep(0.1)
+            if(json_loads(save.text)["e"] != 1):
                 break
-            else:
-                captcha.reportError()
-                print('captcha.reportError')
 
 def get_account():
     """
@@ -246,11 +250,11 @@ gl_info = "快去手动填写！"
 if __name__ == '__main__':
     uid, psw, IYUU_TOKE = get_account()
     if IYUU_TOKE: #有token则通知，无token不通知
-        if len(IYUU_TOKE) != 3:
-            logging.error("请正确配置微信通知功能和验证码打码功能～\n")
+        if len(IYUU_TOKE) != 1:
+            logging.error("请正确配置微信通知功能～\n")
             sys_exit(1)
-        uname = IYUU_TOKE[1]
-        pwd = IYUU_TOKE[2]
+        # uname = IYUU_TOKE[1]
+        # pwd = IYUU_TOKE[2]
         IYUU_TOKE = IYUU_TOKE[0]
         if IYUU_TOKE.startswith('IYUU'):
             iy_info = iyuu(IYUU_TOKE)
@@ -275,10 +279,7 @@ if __name__ == '__main__':
         iy_info("平安复旦：今日已提交", gl_info)
         sys_exit()
 
-    def captcha_info(message):
-        iy_info(message, gl_info)
-    captcha = DailyFDCaptcha(uname,pwd,daily_fudan,captcha_info)
-    daily_fudan.checkin(captcha)
+    daily_fudan.checkin()
 
     # 再检查一遍
     if daily_fudan.check():
