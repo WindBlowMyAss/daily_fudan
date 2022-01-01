@@ -26,5 +26,5 @@ def read_captcha(img_byte):
     return result[0]
 
 def validate_code(session):
-    img = session.get(self.url_code).content
+    img = session.get(‘https://zlapp.fudan.edu.cn/backend/default/codee’).content
     return read_captcha(img)
