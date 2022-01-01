@@ -186,7 +186,7 @@ class Zlapp(Fudan):
             self.last_info = last_info["d"]["info"]
             return False
 
-    def checkin(self, captcha):
+    def checkin(self):
         """
         提交
         """
