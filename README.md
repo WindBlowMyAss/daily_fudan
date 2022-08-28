@@ -57,9 +57,7 @@ http://www.kuaishibie.cn/news/2b2c1b3bb7104c66bdd7ba421eaa4506.html
 - secret名字必须为`FUDAN`！
 - 如果要开启成功填写的通知，在 http://iyuu.cn/ 申请token 然后在密码后面+ `(空格)`+`token`
 - `学号`+`(空格)`+`密码`+ `(空格)`+`token`
-- 如果要开启验证码识别，在 http://www.kuaishibie.cn/ 注册账号
-  然后在token后面 + `(空格)`+`uname` + `(空格)`+`pwd`
-- `学号`+`(空格)`+`密码`+ `(空格)`+`token`+`(空格)`+`uname` + `(空格)`+`pwd`
+- 本项目已集成验证码识别功能
 
 ### 4. 启用 Actions
 
